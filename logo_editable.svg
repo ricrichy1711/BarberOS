@@ -1,0 +1,38 @@
+<svg width="340" height="125" viewBox="47.5 30 340 125" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <!-- Gradiente Dorado de la Web -->
+    <linearGradient id="goldGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#fde68a"/>
+      <stop offset="50%" stop-color="#fbbf24"/>
+      <stop offset="100%" stop-color="#b45309"/>
+    </linearGradient>
+    
+    <!-- Brillo Decorativo -->
+    <linearGradient id="shine" x1="47.5" y1="30" x2="387.5" y2="155" gradientUnits="userSpaceOnUse">
+      <stop stop-color="white" stop-opacity="0.05"/>
+      <stop offset="0.5" stop-color="white" stop-opacity="0"/>
+      <stop offset="1" stop-color="white" stop-opacity="0.05"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Fondo -->
+  <rect x="47.5" y="30" width="340" height="125" rx="36" fill="#050505"/>
+  <rect x="49.5" y="32" width="336" height="121" rx="34" stroke="#d97706" stroke-width="4" stroke-opacity="0.6"/>
+  
+  <!-- OS de Fondo -->
+  <g>
+    <text x="200" y="124" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-style="italic" font-size="105" fill="none" stroke="#1E3A8A" stroke-width="1.5" stroke-opacity="0.3" letter-spacing="0">OS</text>
+    <text x="200" y="124" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-style="italic" font-size="105" fill="none" stroke="#60a5fa" stroke-width="0.2" stroke-opacity="0.8" letter-spacing="0">OS</text>
+    <!-- Efecto Doble con el mismo azul claro -->
+    <text x="203" y="124" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-style="italic" font-size="105" fill="none" stroke="#60a5fa" stroke-width="0.3" stroke-opacity="0.6" letter-spacing="0">OS</text>
+  </g>
+  
+  <!-- BARBER (Mantengo tu posición perfecta: 200 + 35 = 235) -->
+  <text x="200" y="95" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="48" fill="url(#goldGradient)" letter-spacing="8" transform="skewX(-10) translate(35, 0)">BARBER</text>
+  
+  <!-- LM (Mantengo tu posición perfecta) -->
+  <text x="200" y="122" text-anchor="middle" font-family="Arial, sans-serif" font-weight="900" font-size="28" fill="#00A86B" letter-spacing="12" transform="skewX(-10) translate(35, 0)">LM</text>
+  
+  <!-- Capa de Brillo -->
+  <rect x="47.5" y="30" width="340" height="125" rx="36" fill="url(#shine)" pointer-events="none"/>
+</svg>
