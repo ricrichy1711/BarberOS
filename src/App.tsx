@@ -4,6 +4,7 @@ import { DataProvider, useData } from '@/contexts/DataContext';
 import { ThemeProvider, useTheme } from '@/contexts/ThemeContext';
 import { Sun, Moon } from 'lucide-react';
 import { createPortal } from 'react-dom';
+import { Logo } from '@/components/Logo';
 import Home from '@/pages/Home';
 import Directory from '@/pages/Directory';
 import Auth from '@/pages/Auth';
@@ -23,8 +24,12 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
 
   if (loading) {
     return (
-      <div className="flex h-screen items-center justify-center bg-zinc-950">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-zinc-700 border-t-white" />
+      <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 p-4">
+        <div className="flex flex-col items-center animate-pulse">
+          <Logo className="mb-8 scale-150 animate-[spin_3s_linear_infinite]" />
+          <h2 className="text-xl font-bold text-amber-500 mb-2">Cargando Plataforma...</h2>
+          <p className="text-zinc-500 text-sm">Sincronizando base de datos</p>
+        </div>
       </div>
     );
   }

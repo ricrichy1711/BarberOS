@@ -324,6 +324,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
           if (!session) {
             // Si no hay sesión inicial, no bloqueamos. Simplemente marcamos carga lista y traemos datos públicos.
             setLoading(false);
+            initLock.current = false;
             setCurrentUser(null);
             fetchData();
             isFirstLoad.current = false;
@@ -375,7 +376,7 @@ export function DataProvider({ children }: { children: ReactNode }) {
         initLock.current = false;
         isFirstLoad.current = false;
       }
-    }, 25000); // Aumentado a 25s para entornos con filtrado agresivo o seguridad de IA
+    }, 5000); // Reducido a 5s para evitar pantallas negras largas
 
     return () => {
       mounted = false;
