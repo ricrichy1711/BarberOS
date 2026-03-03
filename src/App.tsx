@@ -25,10 +25,17 @@ function ProtectedRoute({ children, allowedRoles }: { children: React.ReactNode;
   if (loading) {
     return (
       <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 p-4">
-        <div className="flex flex-col items-center animate-pulse">
-          <Logo className="mb-8 scale-150 animate-[spin_3s_linear_infinite]" />
-          <h2 className="text-xl font-bold text-amber-500 mb-2">Cargando Plataforma...</h2>
-          <p className="text-zinc-500 text-sm">Sincronizando base de datos</p>
+        <div className="flex flex-col items-center">
+          <div className="relative mb-8 flex items-center justify-center p-4">
+            {/* Anillo dorado giratorio */}
+            <div className="absolute inset-0 rounded-full border-t-4 border-r-4 border-amber-500 border-opacity-80 animate-spin w-48 h-48 m-auto"></div>
+            {/* Logo Estático Centrado */}
+            <div className="z-10 scale-150 relative bg-zinc-950/50 backdrop-blur-sm rounded-3xl p-2">
+              <Logo />
+            </div>
+          </div>
+          <h2 className="text-xl font-bold text-amber-500 mb-2 animate-pulse">Cargando Plataforma...</h2>
+          <p className="text-zinc-500 text-sm animate-pulse">Sincronizando base de datos</p>
         </div>
       </div>
     );
