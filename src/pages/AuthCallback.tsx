@@ -4,8 +4,10 @@ import { supabase } from '@/lib/supabase';
 
 export default function AuthCallback() {
     const navigate = useNavigate();
-    const [status, setStatus] = useState<'loading' | 'success' | 'error'>('loading');
+    const [status, setStatus] = useState<'loading' | 'success' | 'error' | 'recovery'>('loading');
     const [message, setMessage] = useState('Confirmando tu email...');
+    const [newPassword, setNewPassword] = useState('');
+    const [isUpdating, setIsUpdating] = useState(false);
 
     useEffect(() => {
         const handleCallback = async () => {
@@ -94,6 +96,12 @@ export default function AuthCallback() {
                         console.log('✅ El perfil ya existe o hubo un error manejable');
                     }
 
+                    if (type === 'recovery') {
+                        setStatus('recovery');
+                        setMessage('Por favor, ingresa tu nueva contraseña.');
+                        return; // Stop here, wait for user input
+                    }
+
                     setStatus('success');
                     setMessage('¡Sesión confirmada! Redirigiendo...');
 
@@ -140,6 +148,53 @@ export default function AuthCallback() {
                         <h2 className="text-xl font-bold text-white mb-2">¡Éxito!</h2>
                         <p className="text-zinc-400">{message}</p>
                     </>
+                )}
+
+                {status === 'recovery' && (
+                    <div className="text-left py-4">
+                        <div className="mx-auto mb-6 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/20">
+                            <svg className="h-6 w-6 text-amber-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2 text-center">Nueva Contraseña</h2>
+                        <p className="text-zinc-400 text-sm mb-6 text-center">{message}</p>
+
+                        <div className="space-y-4">
+                            <div>
+                                <label className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">Nueva Contraseña</label>
+                                <input
+                                    type="password"
+                                    value={newPassword}
+                                    onChange={(e) => setNewPassword(e.target.value)}
+                                    placeholder="Mínimo 6 caracteres"
+                                    className="w-full rounded-xl border border-zinc-800 bg-zinc-950 py-3 px-4 text-sm text-white outline-none focus:border-amber-500/50"
+                                />
+                            </div>
+                            <button
+                                onClick={async () => {
+                                    if (newPassword.length < 6) {
+                                        alert('La contraseña debe tener al menos 6 caracteres');
+                                        return;
+                                    }
+                                    setIsUpdating(true);
+                                    const { error } = await supabase.auth.updateUser({ password: newPassword });
+                                    if (error) {
+                                        alert('Error al actualizar contraseña: ' + error.message);
+                                        setIsUpdating(false);
+                                    } else {
+                                        setStatus('success');
+                                        setMessage('Contraseña actualizada correctamente. Redirigiendo...');
+                                        setTimeout(() => navigate('/'), 1500);
+                                    }
+                                }}
+                                disabled={isUpdating}
+                                className="flex w-full items-center justify-center rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-3 text-sm font-bold text-zinc-900 transition hover:shadow-lg hover:shadow-amber-400/20 disabled:opacity-50"
+                            >
+                                {isUpdating ? 'Actualizando...' : 'Guardar y Continuar'}
+                            </button>
+                        </div>
+                    </div>
                 )}
 
                 {status === 'error' && (

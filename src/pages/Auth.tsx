@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useData } from '@/contexts/DataContext';
+import { supabase } from '@/lib/supabase';
 import { Mail, Lock, User, Phone, Store, AlertCircle, ArrowRight, Scissors } from 'lucide-react';
 import { Logo } from '@/components/Logo';
 import type { UserRole } from '@/types';
@@ -11,7 +12,7 @@ export default function Auth() {
   const initialRole = searchParams.get('role') as UserRole | null;
   const shopId = searchParams.get('shopId');
 
-  const [mode, setMode] = useState<'login' | 'register'>(initialMode as 'login' | 'register');
+  const [mode, setMode] = useState<'login' | 'register' | 'reset'>(initialMode as 'login' | 'register');
   const [role, setRole] = useState<UserRole>(initialRole || 'client');
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -51,6 +52,26 @@ export default function Auth() {
           }
           setIsSubmitting(false);
           return;
+        }
+      } else if (mode === 'reset') {
+        if (!email) {
+          setError('Por favor ingresa tu email para recuperar la contraseña.');
+          setIsSubmitting(false);
+          return;
+        }
+        try {
+          const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+            redirectTo: window.location.origin + '/auth/callback?type=recovery',
+          });
+          if (resetError) throw resetError;
+          setError('');
+          alert('✅ Instrucciones enviadas.\n\nRevisa tu bandeja de entrada o spam para restablecer tu contraseña.');
+          setMode('login');
+        } catch (resetErr: any) {
+          console.error('Reset error:', resetErr);
+          setError(resetErr.message || 'Error al solicitar el cambio de contraseña.');
+        } finally {
+          setIsSubmitting(false);
         }
       } else {
         if (!name || !email || !phone || !password || !confirmPassword) {
@@ -118,12 +139,14 @@ export default function Auth() {
           <Logo className="mb-6 scale-110" />
 
           <h1 className="text-3xl font-bold text-white text-center">
-            {mode === 'login' ? '¡Bienvenido de nuevo!' : 'Crea tu cuenta'}
+            {mode === 'login' ? '¡Bienvenido de nuevo!' : mode === 'reset' ? 'Recupera tu acceso' : 'Crea tu cuenta'}
           </h1>
           <p className="text-zinc-400 text-sm mt-2 text-center">
             {mode === 'login'
               ? 'Ingresa tus datos para acceder a tu panel de control.'
-              : 'Únete a la nueva era de la barbería digital.'}
+              : mode === 'reset'
+                ? 'Ingresa el email de tu cuenta y te enviaremos un enlace para restablecer tu contraseña.'
+                : 'Únete a la nueva era de la barbería digital.'}
           </p>
         </div>
 
@@ -218,22 +241,35 @@ export default function Auth() {
           </div>
 
           {/* Password */}
-          <div>
-            <label htmlFor="auth-password" className="mb-1.5 block text-xs font-bold uppercase tracking-widest text-zinc-500 ml-1">Contraseña</label>
-            <div className="relative">
-              <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
-              <input
-                id="auth-password"
-                name="password"
-                type="password"
-                value={password}
-                onChange={e => setPassword(e.target.value)}
-                placeholder="••••••••"
-                autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
-                className="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-amber-500/50 placeholder-zinc-600"
-              />
+          {mode !== 'reset' && (
+            <div>
+              <div className="flex justify-between items-center mb-1.5 ml-1">
+                <label htmlFor="auth-password" className="block text-xs font-bold uppercase tracking-widest text-zinc-500">Contraseña</label>
+                {mode === 'login' && (
+                  <button
+                    type="button"
+                    onClick={() => { setMode('reset'); setError(''); }}
+                    className="text-xs font-bold text-amber-500 hover:text-amber-400 transition-colors"
+                  >
+                    ¿Olvidaste tu contraseña?
+                  </button>
+                )}
+              </div>
+              <div className="relative">
+                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-zinc-500" />
+                <input
+                  id="auth-password"
+                  name="password"
+                  type="password"
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  autoComplete={mode === 'login' ? 'current-password' : 'new-password'}
+                  className="w-full rounded-xl border border-zinc-800 bg-zinc-900 py-3 pl-10 pr-4 text-sm text-white outline-none focus:border-amber-500/50 placeholder-zinc-600"
+                />
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Confirm Password */}
           {mode === 'register' && (
@@ -293,13 +329,13 @@ export default function Auth() {
             disabled={isSubmitting}
             className="flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-amber-400 to-orange-500 py-4 text-sm font-bold text-zinc-900 transition hover:shadow-lg hover:shadow-amber-400/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {isSubmitting ? 'Procesando...' : (mode === 'login' ? 'Iniciar Sesión' : 'Crear Cuenta')}
+            {isSubmitting ? 'Procesando...' : (mode === 'login' ? 'Iniciar Sesión' : mode === 'reset' ? 'Enviar Instrucciones' : 'Crear Cuenta')}
             {!isSubmitting && <ArrowRight className="h-4 w-4" />}
           </button>
         </form>
 
         <p className="mt-8 text-center text-sm text-zinc-500">
-          {mode === 'login' ? '¿No tienes cuenta?' : '¿Ya tienes cuenta?'}
+          {mode === 'login' ? '¿No tienes cuenta?' : mode === 'reset' ? '¿Recordaste tu contraseña?' : '¿Ya tienes cuenta?'}
           <button
             onClick={() => { setMode(mode === 'login' ? 'register' : 'login'); setError(''); }}
             className="ml-2 font-bold text-amber-400 hover:text-amber-300 transition-colors"
