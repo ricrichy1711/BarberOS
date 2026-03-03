@@ -90,9 +90,14 @@ interface RegisterData {
   barbershopId?: string;
 }
 
-const DataContext = createContext<DataContextType | null>(null);
+const DataContext = createContext<DataContextType | undefined>(undefined);
 
-export function DataProvider({ children }: { children: ReactNode }) {
+export const DataProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
+  // Verificación de Vercel/Netlify temprana para disparar el ErrorBoundary si no hay ENV
+  if (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY) {
+    throw new Error("Faltan las variables de entorno de Supabase en Producción (Vercel). Configura VITE_SUPABASE_URL y VITE_SUPABASE_ANON_KEY para poder usar la app.");
+  }
+
   const [currentUser, setCurrentUser] = useState<User | null>(() => {
     try {
       const savedUser = localStorage.getItem('barberia_user_cache');
